@@ -43,10 +43,12 @@ void loop() {
   p.joy2_x = analogRead(VRX2);
   p.joy2_y = analogRead(VRY2);
   p.key = keypad.getKey();
+  if (p.key == NO_KEY)
+    p.key = 0;
   uint8_t buffer[10];
   buffer[0] = START_BYTE;
-  buffer[1] = p.joy1_x & 0xFF;        // splits high end
-  buffer[2] = (p.joy1_x >> 8) & 0xFF; // splits low end
+  buffer[1] = p.joy1_x & 0xFF;        // splits low end
+  buffer[2] = (p.joy1_x >> 8) & 0xFF; // splits high end
   buffer[3] = p.joy1_y & 0xFF;
   buffer[4] = (p.joy1_y >> 8) & 0xFF;
   buffer[5] = p.joy2_x & 0xFF;
@@ -55,7 +57,7 @@ void loop() {
   buffer[8] = (p.joy2_y >> 8) & 0xFF;
   buffer[9] = p.key;
   uint8_t checksum = 0;
-  for (int i = 1; 1 < 10; i++)
+  for (int i = 1; i < 10; i++)
     checksum += buffer[i];
   Serial.write(buffer, 10);
   Serial.write(checksum);
