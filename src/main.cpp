@@ -42,9 +42,23 @@ void loop() {
   p.joy1_y = analogRead(VRY1);
   p.joy2_x = analogRead(VRX2);
   p.joy2_y = analogRead(VRY2);
-  p.key = keypad.getKey();
-  if (p.key == NO_KEY)
-    p.key = 0;
+  char k = keypad.getKey();
+  if (k == NO_KEY)
+    p.key = 16; // NO_KEY
+  else if (k >= '0' && k <= '9')
+    p.key = k - '0'; // 0-9
+  else if (k == 'A')
+    p.key = 10;
+  else if (k == 'B')
+    p.key = 11;
+  else if (k == 'C')
+    p.key = 12;
+  else if (k == 'D')
+    p.key = 13;
+  else if (k == '*')
+    p.key = 14;
+  else if (k == '#')
+    p.key = 15;
   uint8_t buffer[10];
   buffer[0] = START_BYTE;
   buffer[1] = p.joy1_x & 0xFF;        // splits low end
