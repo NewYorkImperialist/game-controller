@@ -5,6 +5,7 @@
 #define VRY1 34
 #define VRX2 2
 #define VRY2 4
+#define START_BYTE 0xAA
 
 const byte ROWS = 4;
 const byte COLS = 4;
@@ -17,22 +18,46 @@ byte rowPins[ROWS] = {13, 12, 14, 27};
 byte colPins[COLS] = {26, 25, 33, 32};
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+
+struct __attribute__((packed)) Packet {
+  uint16_t joy1_x;
+  uint16_t joy1_y;
+  uint16_t joy2_x;
+  uint16_t joy2_y;
+  uint8_t key;
+};
+
+Packet p;
+
 void setup() {
   Serial.begin(115200);
   pinMode(VRX1, INPUT);
   pinMode(VRY1, INPUT);
-  pinMode(VRX1, INPUT);
-  pinMode(VRY1, INPUT);
+  pinMode(VRX2, INPUT);
+  pinMode(VRY2, INPUT);
 }
 
 void loop() {
-  uint16_t x1 = analogRead(VRX1);
-  uint16_t y1 = analogRead(VRY1);
-  uint16_t x2 = analogRead(VRX2);
-  uint16_t y2 = analogRead(VRY2);
-  Serial.printf("%d, %d, %d, %d\n", x1, y1, x2, y2);
-  char key = keypad.getKey();
-  if (key) {
-    Serial.println(key);
-  }
+  p.joy1_x = analogRead(VRX1);
+  p.joy1_y = analogRead(VRY1);
+  p.joy2_x = analogRead(VRX2);
+  p.joy2_y = analogRead(VRY2);
+  p.key = keypad.getKey();
+  uint8_t buffer[10];
+  buffer[0] = START_BYTE;
+  buffer[1] = p.joy1_x & 0xFF;        // splits high end
+  buffer[2] = (p.joy1_x >> 8) & 0xFF; // splits low end
+  buffer[3] = p.joy1_y & 0xFF;
+  buffer[4] = (p.joy1_y >> 8) & 0xFF;
+  buffer[5] = p.joy2_x & 0xFF;
+  buffer[6] = (p.joy2_x >> 8) & 0xFF;
+  buffer[7] = p.joy2_y & 0xFF;
+  buffer[8] = (p.joy2_y >> 8) & 0xFF;
+  buffer[9] = p.key;
+  uint8_t checksum = 0;
+  for (int i = 1; 1 < 10; i++)
+    checksum += buffer[i];
+  Serial.write(buffer, 10);
+  Serial.write(checksum);
+  delay(5);
 }
