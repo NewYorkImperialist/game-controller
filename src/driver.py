@@ -53,7 +53,8 @@ while True:
         # UP IS WHAT LEFT USED TO BE 
         # RIGHT IS WHAT UP USED TO BE 
         # DOWN IS WHAT RIGHT USED TO BE 
-        # LEFT IS WHAT UP USED  
+        # LEFT IS WHAT UP USED
+        #
     else: 
         print("(incomplete packet)")
 
