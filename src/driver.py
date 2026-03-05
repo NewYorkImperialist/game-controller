@@ -1,3 +1,4 @@
+from re import template
 import serial
 from pynput.keyboard import Controller as Mouse 
 from pynput.mouse import Controller as Keyboard 
@@ -22,11 +23,6 @@ for _ in range(SAMPLES):
     else:
         print("(incomplete packet)")
 centers = [i / SAMPLES for i in centers]
-
-up = False
-down = False
-left = False
-right = False
 
 while True:
     packet = ser.read(11)
@@ -54,6 +50,11 @@ while True:
         if down: print("down")
         if left: print("left")
         if right: print("right")
+        # DUE TO HOW MY JOYSTICK WORKS
+        # UP IS WHAT LEFT USED TO BE 
+        # RIGHT IS WHAT UP USED TO BE 
+        # DOWN IS WHAT RIGHT USED TO BE 
+        # LEFT IS WHAT UP USED TO BE
     else: 
         print("(incomplete packet)")
 
