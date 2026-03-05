@@ -50,7 +50,6 @@ while True:
         if down: print("down")
         if left: print("left")
         if right: print("right")
-        # DUE TO HOW MY JOYSTICK WORKS
         # UP IS WHAT LEFT USED TO BE 
         # RIGHT IS WHAT UP USED TO BE 
         # DOWN IS WHAT RIGHT USED TO BE 
