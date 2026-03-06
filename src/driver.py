@@ -1,10 +1,9 @@
-from re import template
 import serial
-from pynput.keyboard import Controller as Mouse 
-from pynput.mouse import Controller as Keyboard 
+from pynput.keyboard import Controller as Keyboard 
+from pynput.mouse import Controller as Mouse
 
 SAMPLES = 50
-DEADZONE = 500
+DEADZONE = 750
 
 keyboard = Keyboard()
 mouse = Mouse()
@@ -24,6 +23,8 @@ for _ in range(SAMPLES):
         print("(incomplete packet)")
 centers = [i / SAMPLES for i in centers]
 
+up_held = down_held = left_held = right_held = False
+
 while True:
     packet = ser.read(11)
     if len(packet) == 11:
@@ -34,27 +35,57 @@ while True:
         key = packet[9]
         checksum = packet[10]
         #print(f"J1: ({joy1_x}, {joy1_y}) J2: ({joy2_x}, {joy2_y}) Key: {key} Checksum: {checksum:02X}")
-        if (joy2_y - centers[1] > DEADZONE):
+        if (joy2_y - centers[3] > DEADZONE):
             down = True
-        else: down = False
-        if (centers[1] - joy2_y > DEADZONE):
+        else: 
+            down = False
+        if (centers[3] - joy2_y > DEADZONE):
             up = True
-        else: up = False
-        if (joy2_x - centers[0] > DEADZONE):
+        else: 
+            up = False
+        if (joy2_x - centers[2] > DEADZONE):
             right = True
-        else: right = False
-        if (centers[0] - joy2_x > DEADZONE):
+        else: 
+            right = False
+        if (centers[2] - joy2_x > DEADZONE):
             left = True
         else: left = False 
-        if up: print("up")
-        if down: print("down")
-        if left: print("left")
-        if right: print("right")
+        if up and not up_held: 
+            print("right")
+            keyboard.press("d")
+            up_held = True
+        if not up and up_held:
+            print("released right")
+            keyboard.release("d")
+            up_held = False
+        if down and not down_held: 
+            print("left")
+            keyboard.press("a")
+            down_held = True 
+        if not down and down_held:
+            print("released left")
+            keyboard.release("a")
+            down_held = False 
+        if left and not left_held: 
+            print("up")
+            keyboard.press("w")
+            left_held = True 
+        if not left and left_held:
+            print("released up")
+            keyboard.release("w")
+            left_held = False 
+        if right and not right_held: 
+            print("down")
+            keyboard.press("s")
+            right_held = True  
+        if not right and right_held:
+            print("released down")
+            keyboard.release("s")
+            right_held = False 
         # UP IS WHAT LEFT USED TO BE 
         # RIGHT IS WHAT UP USED TO BE 
         # DOWN IS WHAT RIGHT USED TO BE 
-        # LEFT IS WHAT UP USED
-        # # # # #
+        # LEFT IS WHAT DOWN USED TO BE  
     else: 
         print("(incomplete packet)")
 
