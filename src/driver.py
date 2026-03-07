@@ -2,7 +2,7 @@ import serial
 from pynput.keyboard import Controller as Keyboard 
 from pynput.mouse import Controller as Mouse
 
-SAMPLES = 50
+SAMPLES = 150
 DEADZONE = 750
 
 keyboard = Keyboard()
@@ -35,21 +35,21 @@ while True:
         key = packet[9]
         checksum = packet[10]
         #print(f"J1: ({joy1_x}, {joy1_y}) J2: ({joy2_x}, {joy2_y}) Key: {key} Checksum: {checksum:02X}")
-        if (joy2_y - centers[3] > DEADZONE):
-            down = True
-        else: 
-            down = False
-        if (centers[3] - joy2_y > DEADZONE):
-            up = True
-        else: 
-            up = False
-        if (joy2_x - centers[2] > DEADZONE):
-            right = True
-        else: 
-            right = False
-        if (centers[2] - joy2_x > DEADZONE):
-            left = True
-        else: left = False 
+        wasdx = joy2_x - centers[2]
+        wasdy = joy2_y - centers[3]
+
+        up = down = left = right = False 
+        
+        DOMINANCE = 1.5
+
+        if abs(wasdx) > DEADZONE or abs(wasdy) > DEADZONE:
+            if abs(wasdx) > abs(wasdy) * DOMINANCE: 
+                right = wasdx > 0 
+                left = wasdx < 0 
+            elif abs(wasdy) > abs(wasdx) * DOMINANCE:
+                down = wasdy > 0 
+                up = wasdy < 0
+
         if up and not up_held: 
             print("right")
             keyboard.press("d")
@@ -86,6 +86,16 @@ while True:
         # RIGHT IS WHAT UP USED TO BE 
         # DOWN IS WHAT RIGHT USED TO BE 
         # LEFT IS WHAT DOWN USED TO BE  
+        dx = joy1_x - centers[0]
+        dy = joy1_y - centers[1]
+        mx = my = 0 
+        if abs(dx) > DEADZONE:
+            mx = dx - DEADZONE if dx > 0 else dx + DEADZONE 
+        if abs(dy) > DEADZONE:
+            my = dy - DEADZONE if dy > 0 else dy + DEADZONE
+        if abs(dx) > DEADZONE or abs(dy) > DEADZONE:
+            mouse.move(int(mx * 0.01),int(my * 0.01))
+            print(f"Mouse moved {int(my)} pixels up/down and {int(mx)} pixels right/left")
     else: 
         print("(incomplete packet)")
 
