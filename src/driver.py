@@ -11,6 +11,8 @@ mouse = Mouse()
 ser = serial.Serial('/dev/tty.usbserial-0001', 115200, timeout=1)
 print("Connected! Waiting for data...")
 
+keymaps = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', '*', '#', '!']
+
 centers = [0, 0, 0, 0]
 for _ in range(SAMPLES):
     packet = ser.read(11)
@@ -86,6 +88,11 @@ while True:
         # RIGHT IS WHAT UP USED TO BE 
         # DOWN IS WHAT RIGHT USED TO BE 
         # LEFT IS WHAT DOWN USED TO BE  
+        
+        #temp_joystick = joy1_x
+        #joy1_x = joy1_y
+        #joy1_y = temp_joystick
+
         dx = joy1_x - centers[0]
         dy = joy1_y - centers[1]
         mx = my = 0 
@@ -96,6 +103,9 @@ while True:
         if abs(dx) > DEADZONE or abs(dy) > DEADZONE:
             mouse.move(int(mx * 0.01),int(my * 0.01))
             print(f"Mouse moved {int(my)} pixels up/down and {int(mx)} pixels right/left")
+        if (keymaps[key] != '!'):
+            keyboard.press(keymaps[key])
+            keyboard.release(keymaps[key])
     else: 
         print("(incomplete packet)")
 

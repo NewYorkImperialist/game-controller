@@ -18,14 +18,15 @@ byte rowPins[ROWS] = {13, 12, 14, 27};
 byte colPins[COLS] = {26, 25, 33, 32};
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
-
-struct __attribute__((packed)) Packet {
+// __attribute__(()) -> [[]]
+struct [[gnu::packed]] Packet {
   uint16_t joy1_x;
   uint16_t joy1_y;
   uint16_t joy2_x;
   uint16_t joy2_y;
   uint8_t key;
 };
+// u16 u16 u16 u16 u8 u8 u16
 
 Packet p;
 
